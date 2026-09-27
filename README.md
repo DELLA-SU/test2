@@ -22,3 +22,7 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
 Codex는 설치된 Laya-Mac CLI가 있으면 그 명령의 라우팅 결과를 먼저 확인한 뒤 요청을 실행합니다. Laya-Mac이 없는 Mac에서도 스킬 안의 작은 로컬 도구로 Photo Booth, 메모, Chrome 등 **앱 열기**를 처리할 수 있습니다. 이 도구는 앱을 만드는 것이 아니라 스킬 내부의 실행 보조 파일입니다.
 
 Laya-Mac CLI와 Laya-MLX 모델은 이 공개 저장소에 포함되지 않습니다. 따라서 앱 실행 외의 시스템 조작은 해당 런타임이 설치된 환경에서만 지원하며, 모델 추론을 사용하지 않은 결과를 Laya-MLX 결과로 표시하지 않습니다. [MIT 라이선스](skills/laya-mac-control/LICENSE)는 스킬 폴더에만 적용됩니다.
+
+## 공개 Laya 스킬 조사
+
+[다른 제작자의 스킬 조사표](docs/public-laya-skills.md)에 텍스트 판단 스킬 1개, 브라우저 판단 스킬 2개와 이름이 비슷하지만 구현이 다른 Go 프로젝트를 구분해 정리했습니다. 외부 스킬은 이 저장소에 복사하거나 자동 설치하지 않았습니다.
