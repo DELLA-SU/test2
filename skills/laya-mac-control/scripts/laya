@@ -19,8 +19,8 @@ def normalized(prompt):
 
 
 def route(prompt):
-    original = normalized(prompt)
-    text = original.casefold()
+    original = unicodedata.normalize("NFC", prompt).strip()
+    text = normalized(original).casefold()
     if not text:
         raise ValueError("요청을 입력해 주세요. 예: laya 메모 켜줘")
     if any(word in text for word in ("그리고", "한 다음", "그다음", "삭제", "지워", "종료", "닫아", "잠금")):
@@ -72,7 +72,10 @@ def command(*args, input_text=None, preserve=False):
 
 
 def execute(action, dry_run=False):
-    result = {"engine": "fast-path-rule", **action}
+    public_params = action["params"]
+    if action["action"] == "clipboard_set":
+        public_params = {"text_length": len(action["params"]["text"])}
+    result = {"engine": "fast-path-rule", "action": action["action"], "params": public_params}
     if dry_run:
         result["status"] = "dry-run"
         return result

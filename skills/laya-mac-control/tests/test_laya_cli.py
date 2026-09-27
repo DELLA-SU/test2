@@ -35,6 +35,12 @@ class LayaCliTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     laya_cli.route(prompt)
 
+    def test_clipboard_text_is_preserved_and_not_echoed(self):
+        action = laya_cli.route("클립보드에 Hello   World 복사해줘")
+        self.assertEqual(action["params"]["text"], "Hello   World")
+        result = laya_cli.execute(action, dry_run=True)
+        self.assertEqual(result["params"], {"text_length": 13})
+
     @patch.object(laya_cli, "command")
     def test_dry_run_has_no_side_effect(self, command):
         result = laya_cli.execute(laya_cli.route("메모 켜줘"), dry_run=True)
