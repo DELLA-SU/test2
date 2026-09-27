@@ -1,23 +1,24 @@
-# Laya Mac 앱 실행 스킬
+# Laya Mac Control — Codex Skill
 
-macOS에서 자연어로 앱을 여는 [Codex 스킬](skills/laya-mac-apps/SKILL.md)입니다. Photo Booth, 메모, Chrome 같은 요청은 Laya-Mac의 빠른 규칙 경로처럼 로컬에서 처리합니다. Python 표준 라이브러리와 macOS `open`만 사용하며, 모델 다운로드나 계정이 필요하지 않습니다.
+이 저장소의 [`laya-mac-control`](skills/laya-mac-control/SKILL.md)은 **Codex 스킬**입니다. Codex에게 “포토부스 켜줘”, “메모 열어줘”, “크롬 실행해”라고 요청할 때 사용합니다. 별도 Mac 앱을 설치하는 프로젝트가 아닙니다.
 
-## 설치
+## Codex에 설치
 
-```bash
-git clone https://github.com/hyun2xyz/test2.git
-mkdir -p ~/.codex/skills
-ln -s "$(pwd)/test2/skills/laya-mac-apps" ~/.codex/skills/laya-mac-apps
-```
+Codex에서 다음처럼 요청하세요.
 
-Codex를 새로 시작한 뒤 “포토부스 켜줘”, “메모 열어줘”, “크롬 실행해”처럼 요청할 수 있습니다. 스킬 설치 없이 CLI만 실행할 수도 있습니다.
+> `https://github.com/hyun2xyz/test2/tree/main/skills/laya-mac-control` 스킬을 설치해줘.
+
+또는 Codex의 `skill-installer`를 사용할 수 있습니다.
 
 ```bash
-python3 test2/skills/laya-mac-apps/scripts/laya_app.py '포토부스 켜줘' --dry-run
-python3 test2/skills/laya-mac-apps/scripts/laya_app.py '메모 열어줘'
-python3 test2/skills/laya-mac-apps/scripts/laya_app.py --app 'Google Chrome'
+python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo hyun2xyz/test2 --path skills/laya-mac-control
 ```
 
-`--dry-run`은 앱을 열지 않고 판정만 출력합니다. 기본 제공 별칭 외의 앱은 `--app`으로 macOS 앱 이름을 정확히 지정하세요. 앱이 설치되어 있지 않으면 `open -a` 오류를 반환합니다.
+설치 후 새 Codex 작업에서 `$laya-mac-control 포토부스 켜줘`처럼 호출할 수 있습니다. 자연어 요청에도 스킬이 선택될 수 있습니다.
 
-이 공개판은 앱 실행에 필요한 결정론적 경로만 포함합니다. 별도의 비공개 Laya-Mac 프로젝트나 Laya-MLX 모델을 포함하거나 요구하지 않으며, 모호한 명령은 실행하지 않습니다. [MIT 라이선스](skills/laya-mac-apps/LICENSE)는 `skills/laya-mac-apps` 폴더에만 적용됩니다.
+## 동작 범위
+
+Codex는 설치된 Laya-Mac CLI가 있으면 그 명령의 라우팅 결과를 먼저 확인한 뒤 요청을 실행합니다. Laya-Mac이 없는 Mac에서도 스킬 안의 작은 로컬 도구로 Photo Booth, 메모, Chrome 등 **앱 열기**를 처리할 수 있습니다. 이 도구는 앱을 만드는 것이 아니라 스킬 내부의 실행 보조 파일입니다.
+
+Laya-Mac CLI와 Laya-MLX 모델은 이 공개 저장소에 포함되지 않습니다. 따라서 앱 실행 외의 시스템 조작은 해당 런타임이 설치된 환경에서만 지원하며, 모델 추론을 사용하지 않은 결과를 Laya-MLX 결과로 표시하지 않습니다. [MIT 라이선스](skills/laya-mac-control/LICENSE)는 스킬 폴더에만 적용됩니다.
