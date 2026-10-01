@@ -1,6 +1,6 @@
 ---
 name: laya-mac-control
-description: Use the local `laya` terminal command and macOS built-in tools for basic Mac actions from Codex. Handles Korean requests such as `laya 메모 켜줘`, battery status, system info, volume, clipboard, screenshot, and file search. Do not use for writing inside apps or unrelated Laya desktop software.
+description: Use the local `laya` terminal command for basic macOS actions and the dedicated Hachiware photo collection in Apple Notes. Handles Korean requests such as `laya 메모 켜줘`, `laya 하치왕왕 보여줘`, battery status, volume, clipboard, screenshot, and file search. Do not use for unrelated Laya desktop software.
 ---
 
 # Laya Mac Control
@@ -24,6 +24,9 @@ This is a **Codex skill** with a small terminal command at `scripts/laya`. It tr
 | `laya 클립보드 보여줘` / `laya 클립보드에 안녕 복사해줘` | Read or set clipboard text. |
 | `laya 스크린샷 찍어줘` | Save a PNG in the current directory. |
 | `laya 파일 보고서 찾아줘` | Search Spotlight by filename (first 20 matches). |
+| `Laya 하치왕왕 보여줘` or `laya 하치왕왕 보여줘` | Download one different Hachiware photo from the official Chiikawa Market and append it to the dedicated Apple Note. |
+
+When the user says “Laya 하치왕왕 보여줘” to Codex, run `laya 하치왕왕 보여줘`. Both capitalizations work in Terminal when both aliases are installed. The first run creates the note **Laya 하치왕왕 사진 모음** in the default account's Notes folder; later runs append one photo to that same note. Images are saved in `~/Pictures/Laya/Hachiware`, with selection state in `~/Library/Application Support/Laya/hachiware-note.json`. The command needs internet access and macOS Automation permission for Notes. `photos_added` counts successful runs recorded by this skill.
 
 Use macOS built-in commands directly for another clearly requested basic operation when the local command has no route; do not present that as a `laya` command. Ask for missing paths or content when needed. Opening Notes does not authorize writing a note; opening Chrome does not authorize browsing. Do not invent support for unsupported phrases.
 

@@ -24,6 +24,8 @@ class LayaCliTests(unittest.TestCase):
             ("클립보드에 Hello World 복사해줘", "clipboard_set", {"text": "Hello World"}),
             ("파일 Report.PDF 찾아줘", "file_search", {"name": "Report.PDF"}),
             ("스크린샷 찍어줘", "screenshot", {}),
+            ("하치왕왕 보여줘", "hachiware_note_append", {}),
+            ("Laya 하치왕왕 보여줘", "hachiware_note_append", {}),
         )
         for prompt, action, params in examples:
             with self.subTest(prompt=prompt):
