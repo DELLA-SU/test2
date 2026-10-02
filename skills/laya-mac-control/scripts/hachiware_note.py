@@ -1,4 +1,4 @@
-"""Place one new Hachiware character or goods image at the top of an Apple Note."""
+"""Place one new Hachiware Pinterest image at the top of an Apple Note."""
 
 import ctypes
 import datetime
@@ -9,36 +9,41 @@ import re
 import subprocess
 import tempfile
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
 
 
 TITLE = "Laya 하치왕왕 사진 모음"
-COLLECTION_URL = "https://chiikawamarket.jp/en/collections/hachiware/products.json?limit=250&page={}"
-ANIME_URL = "https://www.anime-chiikawa.jp/"
-# Official anime stills checked to show Hachiware, plus the character portrait.
-CHARACTER_IMAGES = (
-    "images/img_chara_02.png",
-    "images/episodes/005.jpg", "images/episodes/011.jpg",
-    "images/episodes/012.jpg", "images/episodes/017.jpg",
-    "images/episodes/018.jpg", "images/episodes/019.jpg",
-    "images/episodes/021.jpg", "images/episodes/023.jpg",
-    "images/episodes/031.jpg", "images/episodes/033.jpg",
-    "images/episodes/037.jpg", "images/episodes/040.jpg",
-    "images/episodes/041.jpg", "images/episodes/042.jpg",
-    "images/episodes/043.jpg", "images/episodes/046.jpg",
-    "images/episodes/048.jpg", "images/episodes/052.jpg",
-    "images/episodes/055.jpg", "images/episodes/057.jpg",
-    "images/episodes/058.jpg", "images/episodes/060.jpg",
-    "images/episodes/061.jpg", "images/episodes/062.jpg",
-    "images/episodes/067.jpg", "images/episodes/070.jpg",
-    "images/episodes/071.jpg", "images/episodes/072.jpg",
-    "images/episodes/075.jpg", "images/episodes/077.jpg",
-    "images/episodes/078.jpg", "images/episodes/079.jpg",
-    "images/episodes/238.jpg", "images/episodes/239.jpg",
-    "images/episodes/240.jpg", "images/episodes/241.jpg",
-    "images/episodes/242.jpg",
+# Pinterest Ideas search results change over time. These pins were visually checked
+# to contain Hachiware; only use them while they still appear in a live result page.
+PINTEREST_TOPICS = (
+    ("https://jp.pinterest.com/ideas/-/899990466928/", (
+        "1548181177296304", "21392166973299314", "7318418139447558",
+        "8585055532518148", "224476362673742062", "847310117415432103",
+    )),
+    ("https://jp.pinterest.com/ideas/-/948075266825/", (
+        "224476362673742062", "371617406777387688", "667306869818592673",
+        "790733647131578694", "16536723627222258", "17381148556279219",
+        "25684660372588865", "977844137858532817", "42291683992921594",
+        "764767580511925806", "590323463716015564", "464504149095083145",
+    )),
+    ("https://jp.pinterest.com/ideas/-/961250704881/", (
+        "991917886684853422", "7036943161485557", "22095854414297872",
+        "949063321461314949", "732538695684979764", "977492294111418093",
+        "879961214757341770", "936748791254139816", "1075234479806764284",
+        "13510867625511491", "878624208538252397", "565412928239621751",
+        "936748791261478937", "138345019798314373", "3659243439843402",
+        "8162843069130835", "616289530301582011",
+    )),
+    ("https://jp.pinterest.com/ideas/-/941347485649/", (
+        "56787645304065914", "21110691999588152", "7036943161485557",
+        "8162843069130835", "4011087179547450", "23292123067289661",
+        "244742560994019078", "20969954511513615", "3870349674870246",
+        "914862418647523", "174021973096224040", "3870349674870197",
+        "12314598977486119", "21603273207138243", "3659243439843402",
+    )),
 )
 STATE_DIR = Path.home() / "Library" / "Application Support" / "Laya"
 IMAGE_DIR = Path.home() / "Pictures" / "Laya" / "Hachiware"
@@ -46,63 +51,40 @@ SCRIPT = Path(__file__).with_name("append_hachiware.applescript")
 CHECK_SCRIPT = Path(__file__).with_name("check_hachiware.applescript")
 DEDUPE_SCRIPT = Path(__file__).with_name("dedupe_hachiware.applescript")
 SHOW_SCRIPT = Path(__file__).with_name("show_hachiware.applescript")
-USER_AGENT = "Laya-Mac-Control/1.0"
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/125 Safari/537.36"
 
 
-def _get_json(url):
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(request, timeout=20) as response:
-        return json.load(response)
-
-
-def _goods_candidates(page):
-    products = _get_json(COLLECTION_URL.format(page)).get("products", [])
-    for product in products:
-        if not re.search(r"Hachiware|ハチワレ", product.get("title", ""), re.IGNORECASE):
-            continue
-        images = product.get("images") or []
-        if not images:
-            continue
-        image_url = images[0].get("src", "")
-        parsed = urllib.parse.urlparse(image_url)
-        if (parsed.scheme != "https" or parsed.hostname != "cdn.shopify.com" or
-                not parsed.path.startswith("/s/files/1/0626/7142/1681/files/") or
-                not re.search(r"\.(?:jpe?g|png)$", parsed.path, re.IGNORECASE)):
-            continue
-        yield {
-            "url": image_url,
-            "handle": product.get("handle", "hachiware"),
-            "source": "https://chiikawamarket.jp/en/products/" + str(product["handle"]),
-            "kind": "goods",
-        }
-
-
-def _character_candidates():
-    for path in CHARACTER_IMAGES:
-        yield {
-            "url": ANIME_URL + path,
-            "handle": "anime-" + Path(path).stem,
-            "source": ANIME_URL + ("chara.html" if "img_chara" in path else "episode.html"),
-            "kind": "character",
-        }
-
-
-def _select_candidate(used):
-    preferred = ("character", "goods") if len(used) % 2 else ("goods", "character")
-    for kind in preferred:
-        if kind == "character":
-            selection = next((item for item in _character_candidates() if item["url"] not in used), None)
-            if selection:
-                return selection
-        else:
-            for page in range(1, 6):
-                candidates = list(_goods_candidates(page))
-                selection = next((item for item in candidates if item["url"] not in used), None)
-                if selection:
-                    return selection
-                if not candidates:
-                    break
-    raise RuntimeError("새로운 하치와레 사진을 찾지 못했습니다.")
+def _pinterest_candidates(used):
+    seen = set(used)
+    for topic_url, approved_pin_ids in PINTEREST_TOPICS:
+        request = urllib.request.Request(topic_url, headers={"User-Agent": USER_AGENT})
+        with urllib.request.urlopen(request, timeout=20) as response:
+            if urllib.parse.urlparse(response.geturl()).hostname != "jp.pinterest.com":
+                raise RuntimeError("핀터레스트 검색 페이지로 연결되지 않았습니다.")
+            page = response.read(4 * 1024 * 1024 + 1).decode("utf-8")
+        if len(page) > 4 * 1024 * 1024:
+            raise RuntimeError("핀터레스트 검색 페이지가 너무 큽니다.")
+        match = re.search(r'<script id="__PWS_INITIAL_PROPS__"[^>]*>(.*?)</script>', page, re.DOTALL)
+        if not match:
+            raise RuntimeError("핀터레스트 검색 결과를 읽지 못했습니다.")
+        pins = json.loads(match.group(1)).get("initialReduxState", {}).get("pins", {})
+        for pin_id in approved_pin_ids:
+            pin = pins.get(pin_id, {})
+            image = pin.get("images", {}).get("736x", {})
+            image_url = image.get("url", "")
+            parsed = urllib.parse.urlparse(image_url)
+            if (parsed.scheme != "https" or parsed.hostname != "i.pinimg.com" or
+                    not re.fullmatch(r"/736x/[0-9a-f]{2}/[0-9a-f]{2}/[0-9a-f]{2}/[0-9a-f]{32}\.jpe?g", parsed.path)):
+                continue
+            if image_url in seen:
+                continue
+            seen.add(image_url)
+            yield {
+                "url": image_url,
+                "handle": "pinterest-" + pin_id,
+                "source": "https://jp.pinterest.com/pin/" + pin_id + "/",
+                "kind": "pinterest",
+            }
 
 
 def _ensure_accessibility():
@@ -227,9 +209,18 @@ def append_hachiware_photo():
         fcntl.flock(lock, fcntl.LOCK_EX)
         state = json.loads(state_path.read_text()) if state_path.exists() else {}
         used = set(state.get("used_images", []))
-        selection = _select_candidate(used)
+        selection = None
+        image_path = None
+        for candidate in _pinterest_candidates(used):
+            try:
+                image_path = _download(candidate["url"], candidate["handle"])
+            except (urllib.error.URLError, RuntimeError):
+                continue
+            selection = candidate
+            break
+        if selection is None:
+            raise RuntimeError("핀터레스트 검색 결과에서 새로운 하치와레 사진을 내려받지 못했습니다.")
         url = selection["url"]
-        image_path = _download(url, selection["handle"])
         note_id, previous_count = _append_to_notes(image_path, state.get("note_id", ""))
         _wait_for_single_attachment(note_id, image_path.name, previous_count)
 

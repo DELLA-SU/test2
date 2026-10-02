@@ -1,9 +1,10 @@
 import importlib.machinery
 import importlib.util
+import json
 import pathlib
 import sys
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 
 SCRIPT = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "laya"
@@ -59,18 +60,28 @@ class LayaCliTests(unittest.TestCase):
 
 
 class HachiwareSelectionTests(unittest.TestCase):
-    def test_existing_goods_collection_gets_character_next(self):
-        with patch.object(hachiware_note, "_goods_candidates") as goods:
-            selection = hachiware_note._select_candidate({f"goods-{i}" for i in range(9)})
-        goods.assert_not_called()
-        self.assertEqual(selection["kind"], "character")
-        self.assertEqual(selection["url"], "https://www.anime-chiikawa.jp/images/img_chara_02.png")
-
-    def test_character_and_goods_alternate_without_repeating(self):
-        goods = {"url": "goods-new", "kind": "goods"}
-        with patch.object(hachiware_note, "_goods_candidates", return_value=iter([goods])):
-            selection = hachiware_note._select_candidate({"used-" + str(i) for i in range(10)})
-        self.assertEqual(selection, goods)
+    def test_search_uses_only_approved_unused_pinterest_image(self):
+        image_url = "https://i.pinimg.com/736x/83/fb/32/83fb32a034b36a27c2c620260e853397.jpg"
+        page = {"initialReduxState": {"pins": {
+            "1548181177296304": {"images": {"736x": {"url": image_url}}},
+            "unrelated": {"images": {"736x": {"url": "https://elsewhere.test/not-hachiware.jpg"}}},
+        }}}
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.geturl.return_value = "https://jp.pinterest.com/ideas/-/899990466928/"
+        response.read.return_value = (
+            '<script id="__PWS_INITIAL_PROPS__" type="application/json">'
+            + json.dumps(page) + "</script>"
+        ).encode()
+        with patch.object(hachiware_note, "PINTEREST_TOPICS", ((response.geturl(),
+                ("unrelated", "1548181177296304")),)), \
+                patch.object(hachiware_note.urllib.request, "urlopen", return_value=response):
+            selected = list(hachiware_note._pinterest_candidates(set()))
+            used = list(hachiware_note._pinterest_candidates({image_url}))
+        self.assertEqual(len(selected), 1)
+        self.assertEqual(selected[0]["url"], image_url)
+        self.assertEqual(selected[0]["source"], "https://jp.pinterest.com/pin/1548181177296304/")
+        self.assertEqual(used, [])
 
     def test_missing_accessibility_stops_before_download(self):
         accessibility = Mock()
