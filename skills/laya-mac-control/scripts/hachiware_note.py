@@ -1,4 +1,4 @@
-"""Append a different official Hachiware product photo to one Apple Note."""
+"""Place one new official Hachiware photo at the top of a dedicated Apple Note."""
 
 import datetime
 import fcntl
@@ -106,10 +106,10 @@ def _wait_for_single_attachment(note_id, filename, previous_count):
         if completed.returncode:
             raise RuntimeError(completed.stderr.strip() or "메모 첨부 확인에 실패했습니다.")
         parts = completed.stdout.strip().split("\t")
-        if len(parts) != 2 or not all(part.isdigit() for part in parts):
+        if len(parts) != 3 or not all(part.isdigit() for part in parts):
             raise RuntimeError("메모 첨부 확인 결과가 올바르지 않습니다.")
-        total, matches = map(int, parts)
-        if total == previous_count + 1 and matches == 1:
+        total, matches, first_matches = map(int, parts)
+        if total == previous_count + 1 and matches == 1 and first_matches == 1:
             stable += 1
             duplicate_stable = 0
             if stable >= 4:
