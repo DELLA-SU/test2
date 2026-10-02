@@ -3,11 +3,12 @@ import importlib.util
 import pathlib
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 
 SCRIPT = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "laya"
 sys.path.insert(0, str(SCRIPT.parent))
+import hachiware_note
 loader = importlib.machinery.SourceFileLoader("laya_cli", str(SCRIPT))
 spec = importlib.util.spec_from_loader(loader.name, loader)
 laya_cli = importlib.util.module_from_spec(spec)
@@ -55,6 +56,30 @@ class LayaCliTests(unittest.TestCase):
         result = laya_cli.execute(laya_cli.route("메모 켜줘"))
         command.assert_called_once_with("open", "-a", "Notes")
         self.assertEqual(result["status"], "launch-requested")
+
+
+class HachiwareSelectionTests(unittest.TestCase):
+    def test_existing_goods_collection_gets_character_next(self):
+        with patch.object(hachiware_note, "_goods_candidates") as goods:
+            selection = hachiware_note._select_candidate({f"goods-{i}" for i in range(9)})
+        goods.assert_not_called()
+        self.assertEqual(selection["kind"], "character")
+        self.assertEqual(selection["url"], "https://www.anime-chiikawa.jp/images/img_chara_02.png")
+
+    def test_character_and_goods_alternate_without_repeating(self):
+        goods = {"url": "goods-new", "kind": "goods"}
+        with patch.object(hachiware_note, "_goods_candidates", return_value=iter([goods])):
+            selection = hachiware_note._select_candidate({"used-" + str(i) for i in range(10)})
+        self.assertEqual(selection, goods)
+
+    def test_missing_accessibility_stops_before_download(self):
+        accessibility = Mock()
+        accessibility.AXIsProcessTrusted.return_value = False
+        with patch.object(hachiware_note.ctypes, "CDLL", return_value=accessibility), \
+                patch.object(hachiware_note, "_download") as download:
+            with self.assertRaisesRegex(RuntimeError, "손쉬운 사용 권한"):
+                hachiware_note.append_hachiware_photo()
+        download.assert_not_called()
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ ln -s ~/.codex/skills/laya-mac-control/scripts/laya ~/.local/bin/Laya
 
 로컬 `laya` 명령은 Photo Booth, 메모, Chrome, Safari, Finder, 캘린더 실행과 배터리 상태, macOS 정보, 볼륨, 클립보드, 스크린샷, Spotlight 파일 검색을 지원합니다. `--dry-run --json`으로 실행 전 해석 결과를 확인할 수 있습니다. 지원하지 않는 요청은 임의 명령으로 바꾸지 않고 오류를 냅니다.
 
-`Laya 하치왕왕 보여줘` 또는 `laya 하치왕왕 보여줘`는 [공식 치이카와 마켓](https://chiikawamarket.jp/en/collections/hachiware)의 하치와레 상품 사진 한 장을 내려받아 Mac 메모의 **Laya 하치왕왕 사진 모음** 제목 바로 아래에 추가합니다. 다시 실행할 때마다 다른 사진 한 장이 기존 사진 위에 쌓입니다. 사진 파일은 `~/Pictures/Laya/Hachiware`에 보관하며, 처음 실행할 때 macOS가 메모 자동화 권한과 터미널의 손쉬운 사용 권한을 요청할 수 있습니다.
+`Laya 하치왕왕 보여줘` 또는 `laya 하치왕왕 보여줘`는 [공식 애니메이션 사이트](https://www.anime-chiikawa.jp/)의 하치와레 캐릭터 이미지·장면 사진과 [공식 치이카와 마켓](https://chiikawamarket.jp/en/collections/hachiware)의 굿즈 사진을 번갈아 한 장씩 내려받아 Mac 메모의 **Laya 하치왕왕 사진 모음** 제목 바로 아래에 추가합니다. 다시 실행할 때마다 다른 사진 한 장이 기존 사진 위에 쌓입니다. 사진 파일은 `~/Pictures/Laya/Hachiware`에 보관합니다. 터미널에서 실행하려면 시스템 설정 → 개인정보 보호 및 보안 → 손쉬운 사용에서 터미널을 켜야 하며, 메모 자동화 권한도 필요합니다.
 
 이 명령은 macOS 기본 도구를 사용하는 규칙 기반 실행 보조 파일이며 Laya-MLX 모델은 포함하지 않습니다. 결과의 `engine: fast-path-rule`은 모델 추론을 뜻하지 않습니다. [MIT 라이선스](skills/laya-mac-control/LICENSE)는 스킬 폴더에만 적용됩니다.
 
