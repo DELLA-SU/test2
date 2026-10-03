@@ -13,6 +13,8 @@ from pathlib import Path
 
 from laya_app import resolve_app
 
+NIGHT_SONG_URL = "https://www.youtube.com/watch?v=Nc76PTAngtk&list=RDNc76PTAngtk&start_radio=1&t=0s"
+
 
 def normalized(prompt):
     return " ".join(unicodedata.normalize("NFC", prompt).strip().split())
@@ -28,6 +30,8 @@ def route(prompt):
 
     if re.fullmatch(r"(?:laya\s+)?하치왕왕\s*보여(?:줘|주세요)?", text):
         return {"action": "hachiware_note_append", "params": {}}
+    if re.fullmatch(r"(?:laya\s+)?밤이\s*깊었네", text):
+        return {"action": "youtube_play", "params": {"url": NIGHT_SONG_URL}}
 
     if "배터리" in text and any(word in text for word in ("상태", "잔량", "얼마", "알려", "보여", "확인")):
         return {"action": "battery", "params": {}}
@@ -90,6 +94,9 @@ def execute(action, dry_run=False):
     if kind == "launch_app":
         command("open", "-a", params["app"])
         result["status"] = "launch-requested"
+    elif kind == "youtube_play":
+        command("open", params["url"])
+        result["status"] = "open-requested"
     elif kind == "battery":
         result["output"] = command("pmset", "-g", "batt")
     elif kind == "system_info":
@@ -124,7 +131,7 @@ def execute(action, dry_run=False):
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="맥북 기본 기능을 한국어로 실행합니다. 예: laya 메모 켜줘",
-        epilog="예: laya 배터리 상태 알려줘 | laya 볼륨 30으로 설정해 | laya 하치왕왕 보여줘",
+        epilog="예: laya 배터리 상태 알려줘 | laya 볼륨 30으로 설정해 | laya 하치왕왕 보여줘 | Laya 밤이 깊었네",
     )
     parser.add_argument("words", nargs="*", help="한국어 요청. 'run'을 앞에 붙여도 됩니다")
     parser.add_argument("--dry-run", action="store_true", help="동작을 실행하지 않고 분류 결과만 표시")

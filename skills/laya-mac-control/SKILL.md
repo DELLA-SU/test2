@@ -1,6 +1,6 @@
 ---
 name: laya-mac-control
-description: Use the local `laya` terminal command for basic macOS actions and the dedicated Hachiware photo collection in Apple Notes. Handles Korean requests such as `laya 메모 켜줘`, `laya 하치왕왕 보여줘`, battery status, volume, clipboard, screenshot, and file search. Do not use for unrelated Laya desktop software.
+description: Use the local `laya` terminal command for basic macOS actions, a specific YouTube song, and the dedicated Hachiware photo collection in Apple Notes. Handles Korean requests such as `laya 메모 켜줘`, `Laya 밤이 깊었네`, `laya 하치왕왕 보여줘`, battery status, volume, clipboard, screenshot, and file search. Do not use for unrelated Laya desktop software.
 ---
 
 # Laya Mac Control
@@ -25,6 +25,9 @@ This is a **Codex skill** with a small terminal command at `scripts/laya`. It tr
 | `laya 스크린샷 찍어줘` | Save a PNG in the current directory. |
 | `laya 파일 보고서 찾아줘` | Search Spotlight by filename (first 20 matches). |
 | `Laya 하치왕왕 보여줘` or `laya 하치왕왕 보여줘` | Search public Hachiware results on Pinterest, download one new image, and insert it at the top of the dedicated Apple Note. |
+| `Laya 밤이 깊었네` or `laya 밤이 깊었네` | Open the requested YouTube video in the default browser from the beginning, preserving its radio playlist link. |
+
+The song command opens `https://www.youtube.com/watch?v=Nc76PTAngtk&list=RDNc76PTAngtk&start_radio=1&t=0s`. The explicit zero timestamp avoids the 5:12 start time in the original link. The CLI reports that opening the URL was requested; browser autoplay settings may still require a click to start playback.
 
 When the user says “Laya 하치왕왕 보여줘” to Codex, run `laya 하치왕왕 보여줘`. Both capitalizations work in Terminal when both aliases are installed. The first run creates the note **Laya 하치왕왕 사진 모음** in the default account's Notes folder; later runs insert one new image directly below the title, above all older images, in that same note. The command reads current public [Pinterest Hachiware Ideas results](https://jp.pinterest.com/ideas/-/899990466928/) and selects an unused pin whose image was checked to contain Hachiware. It downloads the image from Pinterest's image host and returns the pin URL as `source`. Earlier images from other sites remain in the note. Images are saved in `~/Pictures/Laya/Hachiware`, with selection state in `~/Library/Application Support/Laya/hachiware-note.json`. The command needs internet access, macOS Automation permission for Notes, and Accessibility permission for the terminal app to control the Notes interface. If macOS reports `-25211`, direct the user to System Settings → Privacy & Security → Accessibility and have them enable Terminal (or their terminal app). `photos_added` counts successful runs recorded by this skill.
 

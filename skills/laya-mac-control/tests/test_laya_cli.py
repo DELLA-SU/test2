@@ -28,6 +28,8 @@ class LayaCliTests(unittest.TestCase):
             ("스크린샷 찍어줘", "screenshot", {}),
             ("하치왕왕 보여줘", "hachiware_note_append", {}),
             ("Laya 하치왕왕 보여줘", "hachiware_note_append", {}),
+            ("밤이 깊었네", "youtube_play", {"url": laya_cli.NIGHT_SONG_URL}),
+            ("Laya 밤이 깊었네", "youtube_play", {"url": laya_cli.NIGHT_SONG_URL}),
         )
         for prompt, action, params in examples:
             with self.subTest(prompt=prompt):
@@ -57,6 +59,14 @@ class LayaCliTests(unittest.TestCase):
         result = laya_cli.execute(laya_cli.route("메모 켜줘"))
         command.assert_called_once_with("open", "-a", "Notes")
         self.assertEqual(result["status"], "launch-requested")
+
+    @patch.object(laya_cli.platform, "system", return_value="Darwin")
+    @patch.object(laya_cli, "command")
+    def test_night_song_opens_full_url(self, command, _system):
+        result = laya_cli.execute(laya_cli.route("Laya 밤이 깊었네"))
+        self.assertTrue(laya_cli.NIGHT_SONG_URL.endswith("&t=0s"))
+        command.assert_called_once_with("open", laya_cli.NIGHT_SONG_URL)
+        self.assertEqual(result["status"], "open-requested")
 
 
 class HachiwareSelectionTests(unittest.TestCase):

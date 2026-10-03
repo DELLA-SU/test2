@@ -31,6 +31,8 @@ ln -s ~/.codex/skills/laya-mac-control/scripts/laya ~/.local/bin/Laya
 
 `Laya 하치왕왕 보여줘` 또는 `laya 하치왕왕 보여줘`는 [핀터레스트의 하치와레 검색 결과](https://jp.pinterest.com/ideas/-/899990466928/)에서 확인한 핀 중 사용하지 않은 이미지 한 장을 내려받아 Mac 메모의 **Laya 하치왕왕 사진 모음** 제목 바로 아래에 추가합니다. 다시 실행할 때마다 다른 이미지 한 장이 기존 사진 위에 쌓입니다. 이전에 추가한 사진은 그대로 둡니다. 사진 파일은 `~/Pictures/Laya/Hachiware`에 보관합니다. 터미널에서 실행하려면 시스템 설정 → 개인정보 보호 및 보안 → 손쉬운 사용에서 터미널을 켜야 하며, 메모 자동화 권한도 필요합니다.
 
+`Laya 밤이 깊었네`는 [지정한 유튜브 영상](https://www.youtube.com/watch?v=Nc76PTAngtk&list=RDNc76PTAngtk&start_radio=1&t=0s)을 기본 브라우저에서 처음부터 엽니다. 재생목록 설정은 유지합니다. 브라우저의 자동 재생 설정에 따라 재생 버튼을 눌러야 할 수 있습니다.
+
 이 명령은 macOS 기본 도구를 사용하는 규칙 기반 실행 보조 파일이며 Laya-MLX 모델은 포함하지 않습니다. 결과의 `engine: fast-path-rule`은 모델 추론을 뜻하지 않습니다. [MIT 라이선스](skills/laya-mac-control/LICENSE)는 스킬 폴더에만 적용됩니다.
 
 ## 다른 사람들이 만든 재미있는 Laya 활용
