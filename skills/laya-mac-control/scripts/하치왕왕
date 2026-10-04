@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ "$#" -ne 1 ] || [ "$1" != "보여줘" ]; then
+    printf '%s\n' '사용법: 하치왕왕 보여줘' >&2
+    exit 2
+fi
+exec "$(dirname "$0")/laya" 하치왕왕 보여줘

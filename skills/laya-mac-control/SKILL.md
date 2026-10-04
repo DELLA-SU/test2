@@ -25,6 +25,7 @@ This is a **Codex skill** with a small terminal command at `scripts/laya`. It tr
 | `laya 스크린샷 찍어줘` | Save a PNG in the current directory. |
 | `laya 파일 보고서 찾아줘` | Search Spotlight by filename (first 20 matches). |
 | `Laya 하치왕왕 보여줘` or `laya 하치왕왕 보여줘` | Search public Hachiware results on Pinterest, download one new image, and insert it at the top of the dedicated Apple Note. |
+| `하치왕왕 보여줘` | Run the same photo action through the installed Korean terminal shortcut. |
 | `Laya 밤이 깊었네` or `laya 밤이 깊었네` | Open the requested YouTube video in the default browser from the beginning, preserving its radio playlist link. |
 
 The song command opens `https://www.youtube.com/watch?v=Nc76PTAngtk&list=RDNc76PTAngtk&start_radio=1&t=0s`. The explicit zero timestamp avoids the 5:12 start time in the original link. The CLI reports that opening the URL was requested; browser autoplay settings may still require a click to start playback.
