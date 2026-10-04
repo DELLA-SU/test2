@@ -43,12 +43,7 @@ on run argv
             set focused of text area 1 of scroll area 2 of splitter group 1 of targetWindow to true
             key code 126 using {command down}
             key code 125
-            click menu button 2 of toolbar 1 of targetWindow
-            try
-                click menu item "파일 첨부" of menu 1 of menu button 2 of toolbar 1 of targetWindow
-            on error
-                click menu item "Attach File" of menu 1 of menu button 2 of toolbar 1 of targetWindow
-            end try
+            key code 0 using {command down, shift down}
         end tell
         delay 0.3
         key code 5 using {command down, shift down}

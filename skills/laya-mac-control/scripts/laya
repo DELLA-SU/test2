@@ -28,7 +28,7 @@ def route(prompt):
     if any(word in text for word in ("그리고", "한 다음", "그다음", "삭제", "지워", "종료", "닫아", "잠금")):
         raise ValueError("한 번에 지원하는 동작 하나만 요청해 주세요.")
 
-    if re.fullmatch(r"(?:laya\s+)?하치왕왕\s*보여(?:줘|주세요)?", text):
+    if re.fullmatch(r"(?:laya\s+)?(?:하치왕왕|하왕왕|하앙왕)\s*보여(?:줘|주세요)?", text):
         return {"action": "hachiware_note_append", "params": {}}
     if re.fullmatch(r"(?:laya\s+)?밤이\s*깊었네", text):
         return {"action": "youtube_play", "params": {"url": NIGHT_SONG_URL}}

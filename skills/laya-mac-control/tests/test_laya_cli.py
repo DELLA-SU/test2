@@ -28,6 +28,8 @@ class LayaCliTests(unittest.TestCase):
             ("스크린샷 찍어줘", "screenshot", {}),
             ("하치왕왕 보여줘", "hachiware_note_append", {}),
             ("Laya 하치왕왕 보여줘", "hachiware_note_append", {}),
+            ("Laya 하왕왕 보여줘", "hachiware_note_append", {}),
+            ("Laya 하앙왕 보여줘", "hachiware_note_append", {}),
             ("밤이 깊었네", "youtube_play", {"url": laya_cli.NIGHT_SONG_URL}),
             ("Laya 밤이 깊었네", "youtube_play", {"url": laya_cli.NIGHT_SONG_URL}),
         )
