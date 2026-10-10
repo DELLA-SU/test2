@@ -23,7 +23,14 @@ on run argv
         set targetID to id of targetNote
         show targetNote
         activate
-        set selectedNotes to selection
+        set selectedNotes to {}
+        repeat 100 times
+            set selectedNotes to selection
+            if (count of selectedNotes) is 1 then
+                if (id of item 1 of selectedNotes) is targetID then exit repeat
+            end if
+            delay 0.1
+        end repeat
         if (count of selectedNotes) is not 1 then error "전용 메모 선택을 확인하지 못했습니다."
         if (id of item 1 of selectedNotes) is not targetID then error "다른 메모가 선택되어 사진 추가를 중단했습니다."
     end tell
@@ -56,14 +63,22 @@ on run argv
             set value of text field 1 of sheet 1 of sheet 1 of targetWindow to imagePath
         end tell
         key code 36
+        set attachedAfterPath to false
+        repeat 100 times
+            tell application "Notes"
+                if (count of attachments of (note id targetID)) > previousCount then
+                    set attachedAfterPath to true
+                    exit repeat
+                end if
+            end tell
+            delay 0.1
+        end repeat
         tell process "Notes"
-            repeat 50 times
-                if not (exists sheet 1 of sheet 1 of targetWindow) then exit repeat
-                delay 0.1
-            end repeat
-            if (exists sheet 1 of sheet 1 of targetWindow) then error "사진 파일 선택을 확인하지 못했습니다."
+            if not attachedAfterPath then
+                if (exists sheet 1 of sheet 1 of targetWindow) then error "사진 파일 경로 입력창이 닫히지 않았습니다."
+                key code 36
+            end if
         end tell
-        key code 36
     end tell
 
     return targetID & tab & (previousCount as text)
